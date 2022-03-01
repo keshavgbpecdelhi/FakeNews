@@ -1,0 +1,167 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#1d1d1d">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#1d1d1d">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="#1d1d1d">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Barriecito&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/prod-logo.png' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+	<title>Dashboard</title>
+  </head>
+  <body>
+    <div class="container-fluid">
+        <div class="logo">
+          <a href="{% url 'dashboard_view' %}">
+            <img alt="logo" src="{% static 'img/prod-logo.png' %}" class="prod-logo"/>
+          </a>
+        </div>
+        <h3 class="headline">FakeNews</h3>
+        <div class="headline-border"></div>
+        <div class="dashboard-wrapper">
+          <div class="news-wrapper">
+            {% for n in news %}
+              <div class="card post-card index-post-card">
+                {% if n.news_img_link %}
+                <div class="card-body" style="background-image: linear-gradient(rgb(26, 25, 25),rgba(0, 0, 0, 0.5)), url({{n.news_img_link}});">
+                {% else %}
+                <div class="card-body">
+                {% endif %}
+                  <h5 style="font-size: 16px;">{{ n.news|truncatechars:310 }}</h5>
+                  <br/>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="d-flex justify-content-between align-items-center">
+                          <div class="mr-0">
+                              <img src="{% static 'img/default.png' %}" alt="arnab_prof_pic" class="rounded-circle post-profile-img">
+                          </div>
+                          <div class="ml-2">
+                              <div class="h5 m-0 body">
+                                <a class="post_user_link" href="#">{{ n.user.username }}</a>
+                              </div>
+                              <h6>{{ n.date_time|timesince }} ago</h6>
+                          </div>
+                      </div>
+                      <div class="upvote-downvote-wrapper" id={{n.news_id}}>
+                        <i class="fas fa-globe-americas" name="access-to-related-news" data-toggle="modal" data-target="#related_news-{{n.news_id}}"></i>
+                        <div class="modal fade" id="related_news-{{n.news_id}}" tabindex="-1" role="dialog" aria-labelledby="add-title" aria-hidden="true">
+                          <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5>Related Articles</h5>
+                                <a href="#" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">×</span>
+                                </a>
+                              </div>
+                              <div class="modal-body" id="related_news_body-{{n.news_id}}" style="display: flex;">
+                                <img class="modal-loading-gif loading-gif-active" src="{% static 'img/loading.gif' %}"/>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <a href={{n.news_link}} target="_blank"><i class="fas fa-link"></i></a>
+                        {% if n.fake %}
+                          <a href="#" name="show-news-report" data-toggle="modal" data-target="#report-{{n.news_id}}">
+                            <i class="fas fa-skull-crossbones"></i>
+                          </a>
+                          <h5 class="accuracy">{{ n.accuracy }}%</h5>
+                        {% else %}
+                          <a href="#" name="show-news-report" data-toggle="modal" data-target="#report-{{n.news_id}}">
+                            <i class="far fa-check-circle"></i>
+                          </a>
+                          <h5 class="accuracy">{{ n.accuracy }}%</h5>
+                        {% endif %}
+                        {% csrf_token %}
+                        <i class="fas fa-smile"></i>
+                        <h5 class="upvote">{{ n.news_conn.upvote_count }}</h5>
+                        <i class="fas fa-frown"></i>
+                        <h5 class="downvote">{{ n.news_conn.downvote_count }}</h5>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="profile-wrapper">
+            <div class="prof-wrap-sticky">
+              <img src="/static/img/default.png" alt="default_prof_pic" class="rounded-circle profile-img"/>
+              <h4 class="profile-name">{{ user.username }}</h4>
+              <div class="headline-border" style="position: relative; left: 150px; margin-bottom: 1rem;"></div>
+              <div class="user-details-wrapper">
+                <div class="achievements-section">
+                  <i class="fas fa-chart-area"></i>
+                  <br/>
+                  {% if user_data.accuracy_perc == 0.0 %}
+                    <h2 class="level">--</h2>
+                  {% elif user_data.accuracy_perc >= 85 %}
+                    <h2 class="level" style="color: aquamarine;">Excellent</h2>
+                  {% elif user_data.accuracy_perc >= 65 %}
+                    <h2 class="level" style="color: mediumaquamarine;">Good</h2>
+                  {% elif user_data.accuracy_perc >= 35 %}
+                    <h2 class="level" style="color: orange">Average</h2>
+                  {% else %}
+                    <h2 class="level" style="color: orangered;">Bad</h2>
+                  {% endif %}
+                </div>
+                <div class="contribution-section">
+                  <i class="fas fa-smile"></i>
+                  <strong style="color: black; font-size: 20px;">/</strong> 
+                  <i class="fas fa-frown"></i>
+                  <br/>
+                  <h2 class="contribution">{{ user_data.contribution }}</h2>
+                </div>
+              </div>
+            </div>
+            <div class="user-acc-coins-wrapper">
+              <img src="/static/img/coin.png" alt="newfresh_coin_logo" class="rounded-circle newsfresh-coin-logo"/>
+              <h3 class="user-coins-count" style="color: gold;">{{ user_data.currency }}</h3>
+              <a href="#" class="btn btn-dark coin-redeem-btn" name="redeem_btn">Redeem</a>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-dark article-add-link" name="access-to-add-link" data-toggle="modal" data-target="#add">
+          <i class="fas fa-plus"></i>
+        </button>
+        <div class="modal fade" id="add" tabindex="-1" role="dialog" aria-labelledby="add-title" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5>Post Articles</h5>
+                <a href="#" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </a>
+              </div>
+              <div class="modal-body">
+                <form method="POST" id="article-post-form">
+                  {% csrf_token %}
+                  <div class="form-group">
+                    <textarea class="form-control form-alignment article" id="news_link" name="news_link" aria-label="news" placeholder="Paste Article link here" style="height: 280px;"></textarea>
+                  </div>
+                  <div class="modal-footer">
+                    <div class="btn-group">
+                      <button class="btn btn-dark article-post-btn" name="post_btn" type="submit">Post</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+  </body>
+</html>

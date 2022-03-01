@@ -1,0 +1,11 @@
+django
+pytz
+Pillow
+django-extensions
+pandas
+numpy
+scikit-learn==0.22.1
+nltk
+newspaper3k
+google
+djangorestframework
