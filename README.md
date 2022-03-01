@@ -61,4 +61,6 @@ Windows ->
 Linux -> 
 ```python3 manage.py runserver```
 
-This will run the django backend server. Now, you can visit the link "localhost:8000" to view the project :grin:
+This will run the django backend server. 
+
+Now server started at http://127.0.0.1:8000/
